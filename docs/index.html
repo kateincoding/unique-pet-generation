@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unique Pet Generation - Phase 1 Report</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --orange: #d29922;
+            --red: #f85149;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 2rem;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), #bc8cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            font-size: 1.4rem;
+            color: var(--accent);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border);
+        }
+        h3 {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        p { margin-bottom: 1rem; color: var(--text-muted); }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .metric {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--green);
+        }
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        .architecture {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            white-space: pre;
+            overflow-x: auto;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.6rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        td { color: var(--text-muted); }
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .tag-green { background: rgba(63,185,80,0.15); color: var(--green); }
+        .tag-orange { background: rgba(210,153,34,0.15); color: var(--orange); }
+        .tag-red { background: rgba(248,81,73,0.15); color: var(--red); }
+        .prediction-table td:first-child { font-family: monospace; }
+        .positive { color: var(--green); font-weight: 600; }
+        .negative { color: var(--text-muted); }
+        .section-intro { color: var(--text); margin-bottom: 1rem; }
+        ul { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-muted); }
+        li { margin-bottom: 0.4rem; }
+        code {
+            background: rgba(110,118,129,0.15);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Unique Pet Generation</h1>
+        <p class="subtitle">Phase 1: Baseline de Extraccion de Rasgos Faciales &mdash; Katherine Soto, Mayo 2026</p>
+
+        <!-- ====== OBJETIVO ====== -->
+        <h2>1. Objetivo del Proyecto</h2>
+        <p class="section-intro">
+            El objetivo final de este proyecto es generar mascotas que se parezcan a sus humanos: que compartan
+            color de ojos, tono de pelo, estructura facial y otros rasgos. Para lograr esto, el primer paso
+            (Phase 1) es construir un modelo baseline que extraiga rasgos faciales de fotos humanas y los codifique
+            en un vector de embedding que luego se usara para condicionar la generacion de mascotas.
+        </p>
+
+        <!-- ====== MARCO TEORICO ====== -->
+        <h2>2. Marco Teorico</h2>
+
+        <h3>2.1 Transfer Learning con ResNet-18</h3>
+        <p>
+            ResNet-18 es una red neuronal convolucional de 18 capas con conexiones residuales (skip connections)
+            que resuelven el problema del vanishing gradient en redes profundas. Al usar un modelo pre-entrenado
+            en ImageNet (1.2M imagenes, 1000 clases), aprovecho representaciones visuales ya aprendidas como
+            bordes, texturas y formas, y las adapto a mi tarea especifica de clasificacion de atributos faciales.
+        </p>
+
+        <h3>2.2 Multi-Task Learning</h3>
+        <p>
+            En lugar de entrenar 15 modelos separados (uno por atributo), use un unico modelo con multiples
+            salidas. Esto tiene dos ventajas: las tareas comparten representaciones en las capas intermedias
+            (lo que mejora la generalizacion), y fuerza al embedding bottleneck a capturar informacion
+            relevante para todos los atributos simultaneamente.
+        </p>
+
+        <h3>2.3 Embedding Bottleneck</h3>
+        <p>
+            Entre el backbone (512 dimensiones) y el clasificador, inserte una capa de proyeccion que reduce
+            a 256 dimensiones. Este bottleneck obliga al modelo a comprimir la informacion facial en una
+            representacion densa y semantica. Este vector de 256 dimensiones es el puente hacia Phase 2:
+            sera el input de condicionamiento para el modelo generativo de mascotas.
+        </p>
+
+        <h3>2.4 Dataset: CelebA</h3>
+        <p>
+            Inicialmente considere WIDER FACE, pero ese dataset solo contiene bounding boxes para deteccion
+            de caras &mdash; no tiene atributos faciales. CelebA es la opcion correcta: 202,599 imagenes de
+            rostros alineados, cada uno anotado con 40 atributos binarios incluyendo color de pelo, forma de
+            cara y caracteristicas de ojos y nariz. Use la version de Kaggle
+            (<code>jessicali9530/celeba-dataset</code>).
+        </p>
+
+        <!-- ====== ARQUITECTURA ====== -->
+        <h2>3. Arquitectura del Modelo</h2>
+
+        <div class="architecture">Input (224x224 RGB)
+       |
+ResNet-18 pretrained (trunk) ──── 512-dim feature vector
+       |
+Linear(512, 256) + ReLU + Dropout(0.3) ──── 256-dim EMBEDDING
+       |
+Linear(256, 15) ──── attribute logits</div>
+
+        <h3>Decisiones de diseno</h3>
+        <div class="card">
+            <table>
+                <tr>
+                    <th>Componente</th>
+                    <th>Eleccion</th>
+                    <th>Razon</th>
+                </tr>
+                <tr>
+                    <td>Backbone</td>
+                    <td>ResNet-18</td>
+                    <td>Balance entre capacidad y velocidad de entrenamiento para un baseline. Entrena rapido (~1-2h en MPS) y produce features solidas</td>
+                </tr>
+                <tr>
+                    <td>Embedding dim</td>
+                    <td>256</td>
+                    <td>Suficiente para capturar semantica facial sin overfitting. Vector pequeno = representacion de alto nivel, no detalles pixel-level</td>
+                </tr>
+                <tr>
+                    <td>Dropout</td>
+                    <td>0.3</td>
+                    <td>Regularizacion moderada en el embedding para prevenir co-adaptacion de features</td>
+                </tr>
+                <tr>
+                    <td>Num. atributos</td>
+                    <td>15 de 40</td>
+                    <td>Seleccione los atributos que mapean a rasgos de mascotas: color de pelo → pelaje, forma de cara → cara de mascota</td>
+                </tr>
+                <tr>
+                    <td>Deteccion facial</td>
+                    <td>MTCNN (pretrained)</td>
+                    <td>Solo para inferencia en fotos arbitrarias. CelebA ya viene con imagenes alineadas</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- ====== DECISIONES TRAINING ====== -->
+        <h2>4. Decisiones de Entrenamiento</h2>
+
+        <div class="card">
+            <table>
+                <tr>
+                    <th>Parametro</th>
+                    <th>Valor</th>
+                    <th>Justificacion</th>
+                </tr>
+                <tr>
+                    <td>Loss function</td>
+                    <td>BCEWithLogitsLoss + pos_weight</td>
+                    <td>Combina sigmoid + BCE en una operacion numericamente estable. pos_weight compensa el desbalance de clases (ej: Gray_Hair solo ~4% positivo)</td>
+                </tr>
+                <tr>
+                    <td>Optimizer</td>
+                    <td>AdamW (lr=1e-3, wd=1e-4)</td>
+                    <td>AdamW con weight decay desacoplado. lr=1e-3 es agresivo para heads nuevos pero funciona bien con backbone congelado</td>
+                </tr>
+                <tr>
+                    <td>Scheduler</td>
+                    <td>CosineAnnealingLR</td>
+                    <td>Reduce lr suavemente hacia 0. Mejor que StepLR para convergencia final</td>
+                </tr>
+                <tr>
+                    <td>Backbone freeze</td>
+                    <td>5 epochs</td>
+                    <td>Primero entreno solo embedding + classifier para que aprendan antes de ajustar backbone. Despues fine-tune con lr*0.1 para no destruir features pre-entrenadas</td>
+                </tr>
+                <tr>
+                    <td>Gradient clipping</td>
+                    <td>max_norm=1.0</td>
+                    <td>Previene explosion de gradientes durante fine-tuning del backbone</td>
+                </tr>
+                <tr>
+                    <td>Early stopping</td>
+                    <td>patience=5</td>
+                    <td>Detiene training si val mAP no mejora por 5 epochs. Previene overfitting</td>
+                </tr>
+                <tr>
+                    <td>Batch size</td>
+                    <td>64</td>
+                    <td>Cabe en memoria de Apple Silicon. Suficiente para estimaciones estables de gradiente</td>
+                </tr>
+                <tr>
+                    <td>Data augmentation</td>
+                    <td>RandomResizedCrop, HFlip, ColorJitter, GaussNoise</td>
+                    <td>Simula variaciones reales de fotos: diferentes encuadres, iluminacion, ruido de camara</td>
+                </tr>
+                <tr>
+                    <td>Device</td>
+                    <td>MPS (Apple Silicon)</td>
+                    <td>GPU integrada del Mac. MTCNN forzado a CPU por incompatibilidad con adaptive pooling de MPS</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- ====== 15 ATRIBUTOS ====== -->
+        <h2>5. Atributos Seleccionados</h2>
+        <p>De los 40 atributos de CelebA, seleccione 15 que mapean directamente a caracteristicas de mascotas:</p>
+        <div class="card">
+            <table>
+                <tr><th>Atributo</th><th>Mapeo a mascota</th></tr>
+                <tr><td>Black_Hair, Blond_Hair, Brown_Hair, Gray_Hair</td><td>Color de pelaje</td></tr>
+                <tr><td>Straight_Hair, Wavy_Hair</td><td>Textura de pelaje</td></tr>
+                <tr><td>Arched_Eyebrows, Bushy_Eyebrows</td><td>Expresion facial</td></tr>
+                <tr><td>Narrow_Eyes, Big_Nose, Pointy_Nose</td><td>Rasgos faciales</td></tr>
+                <tr><td>High_Cheekbones, Oval_Face, Pale_Skin, Chubby</td><td>Estructura de cara</td></tr>
+            </table>
+        </div>
+
+        <!-- ====== RESULTADOS ====== -->
+        <h2>6. Resultados del Entrenamiento</h2>
+
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-value">0.7530</div>
+                <div class="metric-label">mAP (val)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">83.2%</div>
+                <div class="metric-label">Accuracy (val)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">19</div>
+                <div class="metric-label">Mejor epoch</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">24/30</div>
+                <div class="metric-label">Early stop</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <p style="color: var(--text);">
+                El modelo entreno 30 epochs con early stopping (patience=5). Paro en la epoch 24,
+                siendo la 19 la que obtuvo el mejor mAP. La mejor configuracion alcanzo
+                <code>train_loss=0.5278</code>, <code>val_loss=0.5396</code>, <code>mAP=0.7530</code>,
+                <code>acc=0.8322</code>.
+            </p>
+        </div>
+
+        <h3>6.1 Prueba de Inferencia en Vivo</h3>
+        <p>
+            Probe el modelo usando la webcam. El sistema abre la camara, al presionar SPACE captura la foto,
+            detecta el rostro con MTCNN y extrae el embedding + predicciones:
+        </p>
+
+        <div class="card">
+            <table class="prediction-table">
+                <tr><th>Atributo</th><th>Probabilidad</th><th>Prediccion</th></tr>
+                <tr><td>Black_Hair</td><td>0.427</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Blond_Hair</td><td>0.001</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Brown_Hair</td><td>0.085</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Gray_Hair</td><td>0.011</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Straight_Hair</td><td>0.163</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Wavy_Hair</td><td>0.045</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Arched_Eyebrows</td><td>0.087</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Bushy_Eyebrows</td><td>0.741</td><td><span class="positive tag tag-green">Si</span></td></tr>
+                <tr><td>Narrow_Eyes</td><td>0.244</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Big_Nose</td><td>0.324</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Pointy_Nose</td><td>0.389</td><td><span class="negative">No</span></td></tr>
+                <tr><td>High_Cheekbones</td><td>0.747</td><td><span class="positive tag tag-green">Si</span></td></tr>
+                <tr><td>Oval_Face</td><td>0.592</td><td><span class="positive tag tag-green">Si</span></td></tr>
+                <tr><td>Pale_Skin</td><td>0.020</td><td><span class="negative">No</span></td></tr>
+                <tr><td>Chubby</td><td>0.747</td><td><span class="positive tag tag-green">Si</span></td></tr>
+            </table>
+        </div>
+
+        <p>
+            <strong style="color: var(--text);">Embedding generado:</strong> vector de 256 dimensiones con norma 11.82.
+            Este vector es la representacion comprimida de mis rasgos faciales que en Phase 2
+            condicionara la generacion de la mascota.
+        </p>
+
+        <!-- ====== ANALISIS ====== -->
+        <h2>7. Analisis y Observaciones</h2>
+
+        <h3>Lo que funciono bien</h3>
+        <ul>
+            <li>Atributos de estructura facial (Bushy_Eyebrows, High_Cheekbones, Oval_Face, Chubby) se clasificaron correctamente con probabilidades altas (&gt;0.59)</li>
+            <li>El modelo descarto correctamente atributos irrelevantes como Blond_Hair (0.001) y Pale_Skin (0.020)</li>
+            <li>El embedding de 256 dimensiones captura representaciones semanticas utiles</li>
+        </ul>
+
+        <h3>Areas por mejorar</h3>
+        <ul>
+            <li><strong>Color de pelo:</strong> ninguno de los 4 atributos de color supero el threshold de 0.5. Black_Hair quedo en 0.427, lo cual es cercano pero no suficiente. Esto puede deberse a que CelebA tiene sesgo hacia ciertos tonos y la iluminacion de webcam afecta la percepcion del color</li>
+            <li><strong>Textura de pelo:</strong> Straight_Hair (0.163) y Wavy_Hair (0.045) no lograron clasificar correctamente. Esto sugiere que el modelo necesita mejor preprocesamiento para diferenciar texturas capilares</li>
+            <li><strong>Mejora de datos:</strong> la imagen de webcam tiene condiciones distintas a CelebA (iluminacion, angulo, resolucion). Un paso de normalizacion o domain adaptation podria ayudar</li>
+        </ul>
+
+        <!-- ====== NEXT STEPS ====== -->
+        <h2>8. Siguientes Pasos (Phase 2)</h2>
+        <ul>
+            <li>Mejorar el preprocesamiento de imagenes para capturar mejor el color y textura del pelo</li>
+            <li>Experimentar con backbones mas grandes (EfficientNet-B0) o agregar atributos continuos</li>
+            <li>Colectar o curar dataset de mascotas diversas con variedad de razas, colores y rasgos</li>
+            <li>Entrenar modelo generativo condicional (diffusion model o StyleGAN) que reciba el embedding de 256-dim como condicionamiento</li>
+            <li>Mapping semantico: "pelo oscuro + cejas pobladas + cara redonda" &rarr; mascota con pelaje oscuro, expresion marcada, cara redondeada</li>
+        </ul>
+
+        <!-- ====== STACK ====== -->
+        <h2>9. Stack Tecnologico</h2>
+        <div class="card">
+            <table>
+                <tr><td>Framework</td><td>PyTorch 2.2</td></tr>
+                <tr><td>Backbone</td><td>ResNet-18 (torchvision, pretrained ImageNet)</td></tr>
+                <tr><td>Face detection</td><td>MTCNN (facenet-pytorch)</td></tr>
+                <tr><td>Augmentation</td><td>Albumentations</td></tr>
+                <tr><td>Dataset</td><td>CelebA via Kaggle (202K images, 40 attrs)</td></tr>
+                <tr><td>Config</td><td>OmegaConf (YAML)</td></tr>
+                <tr><td>Hardware</td><td>Apple Silicon (MPS)</td></tr>
+                <tr><td>Python</td><td>3.12</td></tr>
+            </table>
+        </div>
+
+        <div class="footer">
+            Unique Pet Generation &mdash; Phase 1 Report &mdash; Katherine Soto &mdash; Mayo 2026
+        </div>
+    </div>
+</body>
+</html>
