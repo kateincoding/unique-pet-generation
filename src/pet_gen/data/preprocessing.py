@@ -17,12 +17,13 @@ class FacePreprocessor:
 
     def __init__(self, image_size: int = 224, margin: int = 40, device: torch.device | None = None):
         self.device = device or torch.device("cpu")
+        # MTCNN always on CPU — MPS has adaptive pool issues with arbitrary input sizes
         self.mtcnn = MTCNN(
-            image_size=image_size + margin,
+            image_size=image_size,
             margin=margin,
             keep_all=False,
             select_largest=True,
-            device=self.device,
+            device=torch.device("cpu"),
         )
         self.transform = get_eval_transform(image_size)
         self.image_size = image_size
