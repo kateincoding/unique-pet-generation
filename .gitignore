@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Datasets (demasiado grandes para git)
+face_extractor/data/
+
+# Claude Code
+.claude/
