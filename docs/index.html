@@ -1,428 +1,962 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unique Pet Generation - Phase 1 Report</title>
-    <style>
-        :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --border: #30363d;
-            --text: #e6edf3;
-            --text-muted: #8b949e;
-            --accent: #58a6ff;
-            --green: #3fb950;
-            --orange: #d29922;
-            --red: #f85149;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            padding: 2rem;
-        }
-        .container { max-width: 900px; margin: 0 auto; }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--accent), #bc8cff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        h2 {
-            font-size: 1.4rem;
-            color: var(--accent);
-            margin-top: 2.5rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.3rem;
-            border-bottom: 1px solid var(--border);
-        }
-        h3 {
-            font-size: 1.1rem;
-            color: var(--text);
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        p { margin-bottom: 1rem; color: var(--text-muted); }
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-bottom: 2rem;
-        }
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .metric-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        .metric {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--green);
-        }
-        .metric-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 0.3rem;
-        }
-        .architecture {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 0.9rem;
-            white-space: pre;
-            overflow-x: auto;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-        }
-        th, td {
-            padding: 0.6rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-        th {
-            color: var(--text);
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        td { color: var(--text-muted); }
-        .tag {
-            display: inline-block;
-            padding: 0.15rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        .tag-green { background: rgba(63,185,80,0.15); color: var(--green); }
-        .tag-orange { background: rgba(210,153,34,0.15); color: var(--orange); }
-        .tag-red { background: rgba(248,81,73,0.15); color: var(--red); }
-        .prediction-table td:first-child { font-family: monospace; }
-        .positive { color: var(--green); font-weight: 600; }
-        .negative { color: var(--text-muted); }
-        .section-intro { color: var(--text); margin-bottom: 1rem; }
-        ul { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-muted); }
-        li { margin-bottom: 0.4rem; }
-        code {
-            background: rgba(110,118,129,0.15);
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.9em;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-        }
-        .footer {
-            margin-top: 3rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-align: center;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unique Pet Generation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d14;
+      --surface: #13131f;
+      --card: #1a1a2e;
+      --border: #2a2a45;
+      --accent: #7c6af7;
+      --accent2: #f06fa0;
+      --accent3: #4ecdc4;
+      --text: #e8e8f0;
+      --muted: #6b6b8a;
+      --glow: rgba(124, 106, 247, 0.25);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(124,106,247,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(240,111,160,0.06) 0%, transparent 50%);
+    }
+
+    /* Header */
+    header { text-align: center; margin-bottom: 3rem; }
+
+    .logo {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+
+    header p { color: var(--muted); font-size: 0.95rem; font-weight: 300; }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .step-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .step-card.active-step {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 8px 40px var(--glow);
+    }
+
+    .step-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .step-title { font-size: 1.05rem; font-weight: 600; }
+
+    /* Photo options */
+    .photo-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .photo-option {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.25s;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      user-select: none;
+    }
+
+    .photo-option:hover { border-color: var(--accent); background: rgba(124,106,247,0.07); transform: translateY(-2px); }
+    .photo-option.selected { border-color: var(--accent); background: rgba(124,106,247,0.12); box-shadow: 0 4px 20px var(--glow); }
+
+    .option-icon { font-size: 2.4rem; line-height: 1; }
+    .option-label { font-weight: 600; font-size: 0.95rem; }
+    .option-desc { font-size: 0.78rem; color: var(--muted); }
+
+    /* Upload zone */
+    #upload-area {
+      margin-top: 1.25rem;
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: none;
+      background: var(--surface);
+    }
+
+    #upload-area:hover, #upload-area.drag-over {
+      border-color: var(--accent);
+      background: rgba(124,106,247,0.07);
+    }
+
+    #upload-area p { color: var(--muted); font-size: 0.85rem; margin-top: 0.4rem; }
+    #upload-area .upload-icon { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+    #file-input { display: none; }
+
+    /* Webcam zone */
+    #webcam-area {
+      margin-top: 1.25rem;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #video-container {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    #webcam-feed {
+      width: 100%;
+      display: block;
+      transform: scaleX(-1);
+    }
+
+    .webcam-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .face-guide {
+      width: 55%;
+      aspect-ratio: 3/4;
+      border: 2px dashed rgba(124,106,247,0.6);
+      border-radius: 50% 50% 45% 45%;
+      animation: pulse-guide 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-guide {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 1; }
+    }
+
+    .webcam-btns { display: flex; gap: 0.75rem; }
+
+    /* Preview */
+    #preview-area {
+      margin-top: 1.25rem;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #preview-img {
+      width: 90px; height: 90px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid var(--accent);
+      flex-shrink: 0;
+    }
+
+    .preview-info { flex: 1; min-width: 0; }
+    .preview-info .file-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .preview-info .file-sub  { font-size: 0.78rem; color: var(--muted); margin-top: 0.25rem; }
+
+    /* Model options */
+    .model-options { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .model-option {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.25s;
+      background: var(--surface);
+      user-select: none;
+    }
+
+    .model-option:hover { border-color: var(--accent3); background: rgba(78,205,196,0.06); }
+    .model-option.selected {
+      border-color: var(--accent3);
+      background: rgba(78,205,196,0.1);
+      box-shadow: 0 4px 20px rgba(78,205,196,0.15);
+    }
+
+    .model-icon { font-size: 1.8rem; flex-shrink: 0; }
+
+    .model-info { flex: 1; }
+    .model-name { font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .model-desc { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    .model-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      background: rgba(240,111,160,0.2);
+      color: var(--accent2);
+      border: 1px solid rgba(240,111,160,0.3);
+    }
+
+    .model-badge.stable {
+      background: rgba(78,205,196,0.15);
+      color: var(--accent3);
+      border-color: rgba(78,205,196,0.3);
+    }
+
+    .model-stats {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .stat { font-size: 0.72rem; color: var(--muted); }
+    .stat strong { color: var(--text); }
+
+    .radio-dot {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      transition: all 0.2s;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .model-option.selected .radio-dot { border-color: var(--accent3); }
+
+    .radio-dot::after {
+      content: '';
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent3);
+      transform: scale(0);
+      transition: transform 0.2s;
+    }
+
+    .model-option.selected .radio-dot::after { transform: scale(1); }
+
+    /* Features panel */
+    #features-panel {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .features-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .features-header-left { display: flex; align-items: center; gap: 0.6rem; }
+    .features-title { font-weight: 600; font-size: 0.95rem; }
+
+    .features-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--surface);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-family: monospace;
+    }
+
+    .features-close {
+      background: none; border: none; color: var(--muted);
+      cursor: pointer; font-size: 1.1rem; line-height: 1;
+      padding: 0.2rem; transition: color 0.2s;
+    }
+    .features-close:hover { color: var(--text); }
+
+    .features-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.8rem; }
+
+    /* ResNet bar rows */
+    .attr-row { display: flex; flex-direction: column; gap: 0.3rem; }
+
+    .attr-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.82rem;
+    }
+
+    /* ViT pill grid */
+    .vit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .vit-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .vit-pill-cat {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .vit-pill-val {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent3);
+    }
+
+    .vit-pill-val.negative { color: var(--muted); }
+
+    .attr-name { color: var(--text); font-weight: 500; font-family: monospace; }
+    .attr-val  { color: var(--muted); font-size: 0.78rem; }
+    .attr-val.positive { color: var(--accent3); font-weight: 600; }
+
+    .attr-bar-bg {
+      height: 6px;
+      background: var(--surface);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .attr-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent3));
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    .attr-bar-fill.low { background: linear-gradient(90deg, #374151, #4b5563); }
+
+    .features-raw {
+      margin-top: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .raw-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.4rem; }
+
+    .raw-json {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: var(--accent3);
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    /* CTA */
+    .cta-section { width: 100%; max-width: 680px; margin-top: 0.5rem; }
+
+    #features-btn {
+      width: 100%;
+      padding: 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      opacity: 0.35;
+      pointer-events: none;
+      letter-spacing: 0.01em;
+      margin-bottom: 0.75rem;
+    }
+
+    #features-btn.ready {
+      opacity: 1;
+      pointer-events: auto;
+      color: var(--accent3);
+      border-color: rgba(78,205,196,0.4);
+    }
+
+    #features-btn.ready:hover {
+      background: rgba(78,205,196,0.07);
+      border-color: var(--accent3);
+    }
+
+    #features-btn.loading { opacity: 0.7; pointer-events: none; }
+
+    #generate-btn {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      opacity: 0.35;
+      pointer-events: none;
+      letter-spacing: 0.02em;
+    }
+
+    #generate-btn.ready {
+      opacity: 1;
+      pointer-events: auto;
+      box-shadow: 0 6px 30px rgba(124,106,247,0.35);
+    }
+
+    #generate-btn.ready:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(124,106,247,0.5); }
+    #generate-btn.ready:active { transform: none; }
+
+    /* Buttons */
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #8f7ef9; }
+    .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+    .btn-outline:hover { border-color: var(--muted); }
+    .btn-danger { background: transparent; color: #f87171; border: 1.5px solid rgba(248,113,113,0.3); }
+    .btn-danger:hover { background: rgba(248,113,113,0.1); }
+
+    /* Connector */
+    .connector {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .connector::before, .connector::after {
+      content: '';
+      height: 1px;
+      background: var(--border);
+      flex: 1;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      transition: transform 0.3s;
+      z-index: 999;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .logo { font-size: 1.9rem; }
+      .step-card { padding: 1.5rem; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Unique Pet Generation</h1>
-        <p class="subtitle">Phase 1: Baseline de Extraccion de Rasgos Faciales &mdash; Katherine Soto, Mayo 2026</p>
 
-        <!-- ====== OBJETIVO ====== -->
-        <h2>1. Objetivo del Proyecto</h2>
-        <p class="section-intro">
-            El objetivo final de este proyecto es generar mascotas que se parezcan a sus humanos: que compartan
-            color de ojos, tono de pelo, estructura facial y otros rasgos. Para lograr esto, el primer paso
-            (Phase 1) es construir un modelo baseline que extraiga rasgos faciales de fotos humanas y los codifique
-            en un vector de embedding que luego se usara para condicionar la generacion de mascotas.
-        </p>
+  <header>
+    <div class="logo">🐾 Unique Pet Gen</div>
+    <p>Genera una mascota que se parezca a ti</p>
+  </header>
 
-        <!-- ====== MARCO TEORICO ====== -->
-        <h2>2. Marco Teorico</h2>
+  <div class="steps">
 
-        <h3>2.1 Transfer Learning con ResNet-18</h3>
-        <p>
-            ResNet-18 es una red neuronal convolucional de 18 capas con conexiones residuales (skip connections)
-            que resuelven el problema del vanishing gradient en redes profundas. Al usar un modelo pre-entrenado
-            en ImageNet (1.2M imagenes, 1000 clases), aprovecho representaciones visuales ya aprendidas como
-            bordes, texturas y formas, y las adapto a mi tarea especifica de clasificacion de atributos faciales.
-        </p>
+    <!-- STEP 1 -->
+    <div class="step-card active-step" id="step1-card">
+      <div class="step-label">
+        <div class="step-num">1</div>
+        <div class="step-title">Tu foto</div>
+      </div>
 
-        <h3>2.2 Multi-Task Learning</h3>
-        <p>
-            En lugar de entrenar 15 modelos separados (uno por atributo), use un unico modelo con multiples
-            salidas. Esto tiene dos ventajas: las tareas comparten representaciones en las capas intermedias
-            (lo que mejora la generalizacion), y fuerza al embedding bottleneck a capturar informacion
-            relevante para todos los atributos simultaneamente.
-        </p>
-
-        <h3>2.3 Embedding Bottleneck</h3>
-        <p>
-            Entre el backbone (512 dimensiones) y el clasificador, inserte una capa de proyeccion que reduce
-            a 256 dimensiones. Este bottleneck obliga al modelo a comprimir la informacion facial en una
-            representacion densa y semantica. Este vector de 256 dimensiones es el puente hacia Phase 2:
-            sera el input de condicionamiento para el modelo generativo de mascotas.
-        </p>
-
-        <h3>2.4 Dataset: CelebA</h3>
-        <p>
-            Inicialmente considere WIDER FACE, pero ese dataset solo contiene bounding boxes para deteccion
-            de caras &mdash; no tiene atributos faciales. CelebA es la opcion correcta: 202,599 imagenes de
-            rostros alineados, cada uno anotado con 40 atributos binarios incluyendo color de pelo, forma de
-            cara y caracteristicas de ojos y nariz. Use la version de Kaggle
-            (<code>jessicali9530/celeba-dataset</code>).
-        </p>
-
-        <!-- ====== ARQUITECTURA ====== -->
-        <h2>3. Arquitectura del Modelo</h2>
-
-        <div class="architecture">Input (224x224 RGB)
-       |
-ResNet-18 pretrained (trunk) ──── 512-dim feature vector
-       |
-Linear(512, 256) + ReLU + Dropout(0.3) ──── 256-dim EMBEDDING
-       |
-Linear(256, 15) ──── attribute logits</div>
-
-        <h3>Decisiones de diseno</h3>
-        <div class="card">
-            <table>
-                <tr>
-                    <th>Componente</th>
-                    <th>Eleccion</th>
-                    <th>Razon</th>
-                </tr>
-                <tr>
-                    <td>Backbone</td>
-                    <td>ResNet-18</td>
-                    <td>Balance entre capacidad y velocidad de entrenamiento para un baseline. Entrena rapido (~1-2h en MPS) y produce features solidas</td>
-                </tr>
-                <tr>
-                    <td>Embedding dim</td>
-                    <td>256</td>
-                    <td>Suficiente para capturar semantica facial sin overfitting. Vector pequeno = representacion de alto nivel, no detalles pixel-level</td>
-                </tr>
-                <tr>
-                    <td>Dropout</td>
-                    <td>0.3</td>
-                    <td>Regularizacion moderada en el embedding para prevenir co-adaptacion de features</td>
-                </tr>
-                <tr>
-                    <td>Num. atributos</td>
-                    <td>15 de 40</td>
-                    <td>Seleccione los atributos que mapean a rasgos de mascotas: color de pelo → pelaje, forma de cara → cara de mascota</td>
-                </tr>
-                <tr>
-                    <td>Deteccion facial</td>
-                    <td>MTCNN (pretrained)</td>
-                    <td>Solo para inferencia en fotos arbitrarias. CelebA ya viene con imagenes alineadas</td>
-                </tr>
-            </table>
+      <div class="photo-options">
+        <div class="photo-option" id="opt-upload" onclick="selectPhotoMode('upload')">
+          <div class="option-icon">🖼️</div>
+          <div class="option-label">Subir foto</div>
+          <div class="option-desc">JPG, PNG, WEBP</div>
         </div>
-
-        <!-- ====== DECISIONES TRAINING ====== -->
-        <h2>4. Decisiones de Entrenamiento</h2>
-
-        <div class="card">
-            <table>
-                <tr>
-                    <th>Parametro</th>
-                    <th>Valor</th>
-                    <th>Justificacion</th>
-                </tr>
-                <tr>
-                    <td>Loss function</td>
-                    <td>BCEWithLogitsLoss + pos_weight</td>
-                    <td>Combina sigmoid + BCE en una operacion numericamente estable. pos_weight compensa el desbalance de clases (ej: Gray_Hair solo ~4% positivo)</td>
-                </tr>
-                <tr>
-                    <td>Optimizer</td>
-                    <td>AdamW (lr=1e-3, wd=1e-4)</td>
-                    <td>AdamW con weight decay desacoplado. lr=1e-3 es agresivo para heads nuevos pero funciona bien con backbone congelado</td>
-                </tr>
-                <tr>
-                    <td>Scheduler</td>
-                    <td>CosineAnnealingLR</td>
-                    <td>Reduce lr suavemente hacia 0. Mejor que StepLR para convergencia final</td>
-                </tr>
-                <tr>
-                    <td>Backbone freeze</td>
-                    <td>5 epochs</td>
-                    <td>Primero entreno solo embedding + classifier para que aprendan antes de ajustar backbone. Despues fine-tune con lr*0.1 para no destruir features pre-entrenadas</td>
-                </tr>
-                <tr>
-                    <td>Gradient clipping</td>
-                    <td>max_norm=1.0</td>
-                    <td>Previene explosion de gradientes durante fine-tuning del backbone</td>
-                </tr>
-                <tr>
-                    <td>Early stopping</td>
-                    <td>patience=5</td>
-                    <td>Detiene training si val mAP no mejora por 5 epochs. Previene overfitting</td>
-                </tr>
-                <tr>
-                    <td>Batch size</td>
-                    <td>64</td>
-                    <td>Cabe en memoria de Apple Silicon. Suficiente para estimaciones estables de gradiente</td>
-                </tr>
-                <tr>
-                    <td>Data augmentation</td>
-                    <td>RandomResizedCrop, HFlip, ColorJitter, GaussNoise</td>
-                    <td>Simula variaciones reales de fotos: diferentes encuadres, iluminacion, ruido de camara</td>
-                </tr>
-                <tr>
-                    <td>Device</td>
-                    <td>MPS (Apple Silicon)</td>
-                    <td>GPU integrada del Mac. MTCNN forzado a CPU por incompatibilidad con adaptive pooling de MPS</td>
-                </tr>
-            </table>
+        <div class="photo-option" id="opt-webcam" onclick="selectPhotoMode('webcam')">
+          <div class="option-icon">📷</div>
+          <div class="option-label">Webcam</div>
+          <div class="option-desc">Tomar foto ahora</div>
         </div>
+      </div>
 
-        <!-- ====== 15 ATRIBUTOS ====== -->
-        <h2>5. Atributos Seleccionados</h2>
-        <p>De los 40 atributos de CelebA, seleccione 15 que mapean directamente a caracteristicas de mascotas:</p>
-        <div class="card">
-            <table>
-                <tr><th>Atributo</th><th>Mapeo a mascota</th></tr>
-                <tr><td>Black_Hair, Blond_Hair, Brown_Hair, Gray_Hair</td><td>Color de pelaje</td></tr>
-                <tr><td>Straight_Hair, Wavy_Hair</td><td>Textura de pelaje</td></tr>
-                <tr><td>Arched_Eyebrows, Bushy_Eyebrows</td><td>Expresion facial</td></tr>
-                <tr><td>Narrow_Eyes, Big_Nose, Pointy_Nose</td><td>Rasgos faciales</td></tr>
-                <tr><td>High_Cheekbones, Oval_Face, Pale_Skin, Chubby</td><td>Estructura de cara</td></tr>
-            </table>
+      <!-- Upload zone -->
+      <div id="upload-area"
+           onclick="document.getElementById('file-input').click()"
+           ondragover="event.preventDefault(); this.classList.add('drag-over')"
+           ondragleave="this.classList.remove('drag-over')"
+           ondrop="handleDrop(event)">
+        <span class="upload-icon">⬆️</span>
+        <strong>Clic o arrastra tu foto aquí</strong>
+        <p>Mejor con cara completa y buena iluminación</p>
+      </div>
+      <input type="file" id="file-input" accept="image/*" onchange="handleFileSelect(this)" />
+
+      <!-- Webcam zone -->
+      <div id="webcam-area">
+        <div id="video-container">
+          <video id="webcam-feed" autoplay playsinline></video>
+          <div class="webcam-overlay">
+            <div class="face-guide"></div>
+          </div>
         </div>
-
-        <!-- ====== RESULTADOS ====== -->
-        <h2>6. Resultados del Entrenamiento</h2>
-
-        <div class="metric-grid">
-            <div class="metric">
-                <div class="metric-value">0.7530</div>
-                <div class="metric-label">mAP (val)</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value">83.2%</div>
-                <div class="metric-label">Accuracy (val)</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value">19</div>
-                <div class="metric-label">Mejor epoch</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value">24/30</div>
-                <div class="metric-label">Early stop</div>
-            </div>
+        <div class="webcam-btns">
+          <button class="btn btn-primary" onclick="capturePhoto()">📸 Capturar</button>
+          <button class="btn btn-outline" onclick="stopWebcam()">Cancelar</button>
         </div>
+        <canvas id="capture-canvas" style="display:none"></canvas>
+      </div>
 
-        <div class="card">
-            <p style="color: var(--text);">
-                El modelo entreno 30 epochs con early stopping (patience=5). Paro en la epoch 24,
-                siendo la 19 la que obtuvo el mejor mAP. La mejor configuracion alcanzo
-                <code>train_loss=0.5278</code>, <code>val_loss=0.5396</code>, <code>mAP=0.7530</code>,
-                <code>acc=0.8322</code>.
-            </p>
+      <!-- Preview -->
+      <div id="preview-area">
+        <img id="preview-img" src="" alt="preview" />
+        <div class="preview-info">
+          <div class="file-name" id="preview-name">foto.jpg</div>
+          <div class="file-sub" id="preview-sub">Lista para procesar</div>
         </div>
-
-        <h3>6.1 Prueba de Inferencia en Vivo</h3>
-        <p>
-            Probe el modelo usando la webcam. El sistema abre la camara, al presionar SPACE captura la foto,
-            detecta el rostro con MTCNN y extrae el embedding + predicciones:
-        </p>
-
-        <div class="card">
-            <table class="prediction-table">
-                <tr><th>Atributo</th><th>Probabilidad</th><th>Prediccion</th></tr>
-                <tr><td>Black_Hair</td><td>0.427</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Blond_Hair</td><td>0.001</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Brown_Hair</td><td>0.085</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Gray_Hair</td><td>0.011</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Straight_Hair</td><td>0.163</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Wavy_Hair</td><td>0.045</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Arched_Eyebrows</td><td>0.087</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Bushy_Eyebrows</td><td>0.741</td><td><span class="positive tag tag-green">Si</span></td></tr>
-                <tr><td>Narrow_Eyes</td><td>0.244</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Big_Nose</td><td>0.324</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Pointy_Nose</td><td>0.389</td><td><span class="negative">No</span></td></tr>
-                <tr><td>High_Cheekbones</td><td>0.747</td><td><span class="positive tag tag-green">Si</span></td></tr>
-                <tr><td>Oval_Face</td><td>0.592</td><td><span class="positive tag tag-green">Si</span></td></tr>
-                <tr><td>Pale_Skin</td><td>0.020</td><td><span class="negative">No</span></td></tr>
-                <tr><td>Chubby</td><td>0.747</td><td><span class="positive tag tag-green">Si</span></td></tr>
-            </table>
-        </div>
-
-        <p>
-            <strong style="color: var(--text);">Embedding generado:</strong> vector de 256 dimensiones con norma 11.82.
-            Este vector es la representacion comprimida de mis rasgos faciales que en Phase 2
-            condicionara la generacion de la mascota.
-        </p>
-
-        <!-- ====== ANALISIS ====== -->
-        <h2>7. Analisis y Observaciones</h2>
-
-        <h3>Lo que funciono bien</h3>
-        <ul>
-            <li>Atributos de estructura facial (Bushy_Eyebrows, High_Cheekbones, Oval_Face, Chubby) se clasificaron correctamente con probabilidades altas (&gt;0.59)</li>
-            <li>El modelo descarto correctamente atributos irrelevantes como Blond_Hair (0.001) y Pale_Skin (0.020)</li>
-            <li>El embedding de 256 dimensiones captura representaciones semanticas utiles</li>
-        </ul>
-
-        <h3>Areas por mejorar</h3>
-        <ul>
-            <li><strong>Color de pelo:</strong> ninguno de los 4 atributos de color supero el threshold de 0.5. Black_Hair quedo en 0.427, lo cual es cercano pero no suficiente. Esto puede deberse a que CelebA tiene sesgo hacia ciertos tonos y la iluminacion de webcam afecta la percepcion del color</li>
-            <li><strong>Textura de pelo:</strong> Straight_Hair (0.163) y Wavy_Hair (0.045) no lograron clasificar correctamente. Esto sugiere que el modelo necesita mejor preprocesamiento para diferenciar texturas capilares</li>
-            <li><strong>Mejora de datos:</strong> la imagen de webcam tiene condiciones distintas a CelebA (iluminacion, angulo, resolucion). Un paso de normalizacion o domain adaptation podria ayudar</li>
-        </ul>
-
-        <!-- ====== NEXT STEPS ====== -->
-        <h2>8. Siguientes Pasos (Phase 2)</h2>
-        <ul>
-            <li>Mejorar el preprocesamiento de imagenes para capturar mejor el color y textura del pelo</li>
-            <li>Experimentar con backbones mas grandes (EfficientNet-B0) o agregar atributos continuos</li>
-            <li>Colectar o curar dataset de mascotas diversas con variedad de razas, colores y rasgos</li>
-            <li>Entrenar modelo generativo condicional (diffusion model o StyleGAN) que reciba el embedding de 256-dim como condicionamiento</li>
-            <li>Mapping semantico: "pelo oscuro + cejas pobladas + cara redonda" &rarr; mascota con pelaje oscuro, expresion marcada, cara redondeada</li>
-        </ul>
-
-        <!-- ====== STACK ====== -->
-        <h2>9. Stack Tecnologico</h2>
-        <div class="card">
-            <table>
-                <tr><td>Framework</td><td>PyTorch 2.2</td></tr>
-                <tr><td>Backbone</td><td>ResNet-18 (torchvision, pretrained ImageNet)</td></tr>
-                <tr><td>Face detection</td><td>MTCNN (facenet-pytorch)</td></tr>
-                <tr><td>Augmentation</td><td>Albumentations</td></tr>
-                <tr><td>Dataset</td><td>CelebA via Kaggle (202K images, 40 attrs)</td></tr>
-                <tr><td>Config</td><td>OmegaConf (YAML)</td></tr>
-                <tr><td>Hardware</td><td>Apple Silicon (MPS)</td></tr>
-                <tr><td>Python</td><td>3.12</td></tr>
-            </table>
-        </div>
-
-        <div class="footer">
-            Unique Pet Generation &mdash; Phase 1 Report &mdash; Katherine Soto &mdash; Mayo 2026
-        </div>
+        <button class="btn btn-danger" onclick="clearPhoto()">✕ Quitar</button>
+      </div>
     </div>
+
+    <div class="connector">↓ luego</div>
+
+    <!-- STEP 2 -->
+    <div class="step-card" id="step2-card">
+      <div class="step-label">
+        <div class="step-num">2</div>
+        <div class="step-title">Elige modelo</div>
+      </div>
+
+      <div class="model-options">
+
+        <div class="model-option" id="model-resnet" onclick="selectModel('resnet')">
+          <div class="model-icon">🏗️</div>
+          <div class="model-info">
+            <div class="model-name">
+              ResNet-18
+              <span class="model-badge stable">Estable</span>
+            </div>
+            <div class="model-desc">Baseline probado — val mAP 0.753, accuracy 83.2%</div>
+            <div class="model-stats">
+              <div class="stat">Backbone: <strong>ResNet-18</strong></div>
+              <div class="stat">Attrs: <strong>15</strong></div>
+              <div class="stat">Embed: <strong>256-dim</strong></div>
+              <div class="stat">Checkpoint: <strong>resnet-18.pt</strong></div>
+            </div>
+          </div>
+          <div class="radio-dot"></div>
+        </div>
+
+        <div class="model-option" id="model-vit" onclick="selectModel('vit')">
+          <div class="model-icon">✨</div>
+          <div class="model-info">
+            <div class="model-name">
+              ViT Multihead
+              <span class="model-badge">Experimental</span>
+            </div>
+            <div class="model-desc">Vision Transformer con attention heads por atributo</div>
+            <div class="model-stats">
+              <div class="stat">Backbone: <strong>ViT-B/16</strong></div>
+              <div class="stat">Heads: <strong>multi-attr</strong></div>
+              <div class="stat">Checkpoint: <strong>vit_multihead_best.pt</strong></div>
+            </div>
+          </div>
+          <div class="radio-dot"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Features panel -->
+  <div id="features-panel" style="margin-top: 2rem;">
+    <div class="features-header">
+      <div class="features-header-left">
+        <span>🔬</span>
+        <span class="features-title">Características detectadas</span>
+        <span class="features-meta" id="features-meta-model">resnet-18.pt</span>
+      </div>
+      <button class="features-close" onclick="closeFeatures()">✕</button>
+    </div>
+    <div class="features-body" id="features-body"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section" style="margin-top: 1.5rem;">
+    <button id="features-btn" onclick="runFeatures()">
+      🔬 Ver características del modelo
+    </button>
+    <button id="generate-btn" onclick="generate()">
+      🐾 Generar mascota
+    </button>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+  let photoMode = null;
+  let photoReady = false;
+  let modelSelected = null;
+  let webcamStream = null;
+
+  function selectPhotoMode(mode) {
+    photoMode = mode;
+    document.getElementById('opt-upload').classList.toggle('selected', mode === 'upload');
+    document.getElementById('opt-webcam').classList.toggle('selected', mode === 'webcam');
+    document.getElementById('upload-area').style.display = mode === 'upload' ? 'block' : 'none';
+    document.getElementById('webcam-area').style.display = mode === 'webcam' ? 'flex' : 'none';
+    if (mode === 'webcam') startWebcam();
+    else stopWebcam();
+  }
+
+  function handleFileSelect(input) {
+    if (!input.files[0]) return;
+    loadFile(input.files[0]);
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('upload-area').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadFile(file);
+  }
+
+  function loadFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => showPreview(e.target.result, file.name, formatBytes(file.size));
+    reader.readAsDataURL(file);
+  }
+
+  function formatBytes(b) {
+    return b < 1024*1024 ? (b/1024).toFixed(0)+'KB' : (b/1024/1024).toFixed(1)+'MB';
+  }
+
+  async function startWebcam() {
+    try {
+      webcamStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: 640, height: 480 }
+      });
+      document.getElementById('webcam-feed').srcObject = webcamStream;
+    } catch(err) {
+      toast('No se pudo acceder a la cámara 😔');
+      document.getElementById('opt-webcam').classList.remove('selected');
+      document.getElementById('webcam-area').style.display = 'none';
+      photoMode = null;
+    }
+  }
+
+  function stopWebcam() {
+    if (webcamStream) {
+      webcamStream.getTracks().forEach(t => t.stop());
+      webcamStream = null;
+    }
+    document.getElementById('webcam-area').style.display = 'none';
+  }
+
+  function capturePhoto() {
+    const video = document.getElementById('webcam-feed');
+    const canvas = document.getElementById('capture-canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0);
+    showPreview(canvas.toDataURL('image/jpeg', 0.92), 'webcam_capture.jpg', '');
+    stopWebcam();
+  }
+
+  function showPreview(src, name, size) {
+    document.getElementById('preview-img').src = src;
+    document.getElementById('preview-name').textContent = name;
+    document.getElementById('preview-sub').textContent = size ? `${size} — lista para procesar` : 'Captura lista';
+    document.getElementById('preview-area').style.display = 'flex';
+    document.getElementById('upload-area').style.display = 'none';
+    document.getElementById('webcam-area').style.display = 'none';
+    photoReady = true;
+    document.getElementById('step2-card').classList.add('active-step');
+    checkReady();
+  }
+
+  function clearPhoto() {
+    document.getElementById('preview-area').style.display = 'none';
+    document.getElementById('file-input').value = '';
+    photoReady = false;
+    if (photoMode === 'upload') document.getElementById('upload-area').style.display = 'block';
+    document.getElementById('step2-card').classList.remove('active-step');
+    checkReady();
+  }
+
+  function selectModel(m) {
+    modelSelected = m;
+    document.getElementById('model-resnet').classList.toggle('selected', m === 'resnet');
+    document.getElementById('model-vit').classList.toggle('selected', m === 'vit');
+    checkReady();
+  }
+
+  function checkReady() {
+    const ready = photoReady && modelSelected !== null;
+    document.getElementById('generate-btn').classList.toggle('ready', ready);
+    document.getElementById('features-btn').classList.toggle('ready', ready);
+  }
+
+  // ResNet-18 (15 binary attrs)
+  const ATTRS = [
+    'Black_Hair','Blond_Hair','Brown_Hair','Gray_Hair',
+    'Straight_Hair','Wavy_Hair','Arched_Eyebrows','Bushy_Eyebrows',
+    'Narrow_Eyes','Big_Nose','Pointy_Nose','High_Cheekbones',
+    'Oval_Face','Pale_Skin','Chubby'
+  ];
+
+  // ViT Multihead (flat category → string)
+  const VIT_CATS = [
+    'color_pelo','textura_pelo','longitud_pelo','cejas','forma_ojos',
+    'tamano_nariz','forma_nariz','grosor_labios','pomulos','mandibula',
+    'barbilla','forma_cara','vello_facial','gafas','pecas',
+    'tono_piel','rango_edad','color_ojos','tono_piel_lab'
+  ];
+
+  // Valores "negativos" para los booleanos
+  const NEGATIVE_VALUES = new Set(['False', 'false', 'no', 'sin_barba', 'calvo']);
+
+  function runFeatures() {
+    if (!photoReady || !modelSelected) return;
+    const btn = document.getElementById('features-btn');
+    btn.classList.add('loading');
+    btn.textContent = '⏳ Analizando…';
+
+    // TODO: replace with real fetch to backend
+    setTimeout(() => {
+      let rawOutput;
+      if (modelSelected === 'vit') {
+        // ViT real output format: flat { category: "predicted_class" }
+        const VIT_SAMPLE_VALUES = {
+          color_pelo: ['negro','castano','rubio','pelirrojo','gris','calvo'],
+          textura_pelo: ['liso','ondulado','rizado','muy_rizado'],
+          longitud_pelo: ['corto','medio','largo','calvo'],
+          cejas: ['normales','arqueadas','pobladas','finas','rectas'],
+          forma_ojos: ['almendrada','redonda','rasgada','caida','prominente'],
+          tamano_nariz: ['pequena','mediana','grande'],
+          forma_nariz: ['recta','aguileña','respingona','ancha'],
+          grosor_labios: ['finos','medianos','carnosos'],
+          pomulos: ['planos','normales','altos','prominentes'],
+          mandibula: ['suave','marcada','ancha','estrecha'],
+          barbilla: ['redonda','puntiaguda','cuadrada','hendida'],
+          forma_cara: ['oval','redonda','cuadrada','corazon','diamante','oblonga'],
+          vello_facial: ['sin_barba','barba_corta','barba_larga','bigote'],
+          gafas: ['False','True'],
+          pecas: ['False','True'],
+          tono_piel: ['muy_claro','claro','medio','oliva','bronceado','oscuro'],
+          rango_edad: ['nino','joven','adulto','maduro','mayor'],
+          color_ojos: ['marron','azul','verde','gris','avellana'],
+          tono_piel_lab: ['muy_claro','claro','medio','oscuro'],
+        };
+        rawOutput = Object.fromEntries(
+          VIT_CATS.map(cat => {
+            const opts = VIT_SAMPLE_VALUES[cat] || ['?'];
+            return [cat, opts[Math.floor(Math.random() * opts.length)]];
+          })
+        );
+      } else {
+        // ResNet old checkpoint format
+        rawOutput = { embedding_dim: 256, logits_raw: ATTRS.slice(0, 8).map(() => +(Math.random() * 6 - 3).toFixed(3)) };
+      }
+      renderFeatures(rawOutput);
+      btn.classList.remove('loading');
+      btn.textContent = '🔬 Ver características del modelo';
+    }, 800);
+  }
+
+  function makeAttrRow(name, logit, prob) {
+    const positive = prob >= 0.5;
+    const pct = Math.round(prob * 100);
+    const row = document.createElement('div');
+    row.className = 'attr-row';
+    row.innerHTML = `
+      <div class="attr-top">
+        <span class="attr-name">${name}</span>
+        <span class="attr-val ${positive ? 'positive' : ''}">
+          ${positive ? '✓' : '✗'} &nbsp;${pct}% &nbsp;<span style="color:var(--muted);font-weight:400">(logit ${logit >= 0 ? '+' : ''}${logit})</span>
+        </span>
+      </div>
+      <div class="attr-bar-bg">
+        <div class="attr-bar-fill ${pct < 30 ? 'low' : ''}" style="width:0%" data-target="${pct}%"></div>
+      </div>`;
+    return row;
+  }
+
+  function renderFeatures(rawOutput) {
+    const modelFile = modelSelected === 'resnet' ? 'resnet-18.pt' : 'vit_multihead_best.pt';
+    document.getElementById('features-meta-model').textContent = modelFile;
+
+    const body = document.getElementById('features-body');
+    body.innerHTML = '';
+
+    const ATTRS_8 = ATTRS.slice(0, 8);
+
+    const hasAllAttrs  = ATTRS.every(a => a in rawOutput && typeof rawOutput[a].prob === 'number');
+    const hasVitSchema = VIT_CATS.some(c => c in rawOutput) && Object.values(rawOutput).every(v => typeof v === 'string');
+    const hasLegacySchema = !hasAllAttrs && !hasVitSchema
+      && Array.isArray(rawOutput.logits_raw)
+      && rawOutput.logits_raw.length === ATTRS_8.length;
+
+    if (hasVitSchema) {
+      const grid = document.createElement('div');
+      grid.className = 'vit-grid';
+      Object.entries(rawOutput).forEach(([cat, val]) => {
+        const isNeg = NEGATIVE_VALUES.has(String(val));
+        const pill = document.createElement('div');
+        pill.className = 'vit-pill';
+        pill.innerHTML = `
+          <div class="vit-pill-cat">${cat.replace(/_/g, ' ')}</div>
+          <div class="vit-pill-val ${isNeg ? 'negative' : ''}">${val}</div>`;
+        grid.appendChild(pill);
+      });
+      body.appendChild(grid);
+    } else if (hasAllAttrs) {
+      ATTRS.forEach(name => {
+        const { logit, prob } = rawOutput[name];
+        body.appendChild(makeAttrRow(name, logit, prob));
+      });
+    } else if (hasLegacySchema) {
+      const notice = document.createElement('div');
+      notice.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--muted);padding:0.1rem 0 1rem';
+      notice.innerHTML = `<span style="color:#f59e0b">⚠</span> Checkpoint antiguo (8 attrs) — mostrando mapeo parcial`;
+      body.appendChild(notice);
+      ATTRS_8.forEach((name, i) => {
+        const logit = rawOutput.logits_raw[i];
+        const prob  = +(1 / (1 + Math.exp(-logit))).toFixed(3);
+        body.appendChild(makeAttrRow(name, logit, prob));
+      });
+    } else {
+      const notice = document.createElement('div');
+      notice.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--muted);padding:0.1rem 0 0.75rem';
+      notice.innerHTML = `<span style="color:#f59e0b">⚠</span> Schema desconocido — solo output raw`;
+      body.appendChild(notice);
+    }
+
+    const rawSection = document.createElement('div');
+    rawSection.className = 'features-raw';
+    rawSection.innerHTML = `
+      <div class="raw-label">raw output</div>
+      <div class="raw-json">${JSON.stringify(rawOutput, null, 2)}</div>`;
+    body.appendChild(rawSection);
+
+    const panel = document.getElementById('features-panel');
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        panel.querySelectorAll('.attr-bar-fill').forEach(el => {
+          el.style.width = el.dataset.target;
+        });
+      });
+    });
+  }
+
+  function closeFeatures() {
+    document.getElementById('features-panel').style.display = 'none';
+  }
+
+  function generate() {
+    if (!photoReady || !modelSelected) return;
+    const file = modelSelected === 'resnet' ? 'resnet-18.pt' : 'vit_multihead_best.pt';
+    toast(`Procesando con ${file}… 🐾`);
+    // TODO: conectar backend / scripts/inference.py
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+</script>
 </body>
 </html>
