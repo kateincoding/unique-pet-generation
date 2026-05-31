@@ -15,10 +15,11 @@
     "vello_facial": "sin_barba",
     "gafas": "False",
     "pecas": "False",
-    "tono_piel": "oliva",
     "rango_edad": "joven",
     "color_ojos": "marron",
-    "tono_piel_lab": "claro"
+    "tono_piel": "oliva",
+    "tono_piel_fairface": "oliva",
+    "color_ojos_hsv": "avellana"
   },
   "test_photos/foto1.jpeg": {
     "color_pelo": "castano",
@@ -36,10 +37,11 @@
     "vello_facial": "sin_barba",
     "gafas": "False",
     "pecas": "False",
-    "tono_piel": "oliva",
     "rango_edad": "joven",
     "color_ojos": "marron",
-    "tono_piel_lab": "claro"
+    "tono_piel": "medio",
+    "tono_piel_fairface": "oliva",
+    "color_ojos_hsv": "avellana"
   },
   "test_photos/foto2.jpeg": {
     "color_pelo": "castano",
@@ -57,9 +59,10 @@
     "vello_facial": "sin_barba",
     "gafas": "False",
     "pecas": "False",
-    "tono_piel": "oliva",
     "rango_edad": "joven",
     "color_ojos": "marron",
-    "tono_piel_lab": "claro"
+    "tono_piel": "claro",
+    "tono_piel_fairface": "oliva",
+    "color_ojos_hsv": "ambar"
   }
 }
