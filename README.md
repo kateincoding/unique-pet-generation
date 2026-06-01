@@ -2,9 +2,27 @@
 
 Generate pets that resemble their human owners by extracting facial features and mapping them to pet characteristics.
 
-## Phase 1: Facial Feature Extraction Baseline
+## Phase 1: Facial Feature Extraction
 
-A multi-task neural network that extracts facial attributes from human photos, producing a 256-dimensional embedding that encodes characteristics like hair color, face shape, and facial structure.
+Two complementary approaches extract facial attributes from human photos:
+
+1. **Deep learning models** — a ResNet-18 baseline and a ViT-B/16 multi-head model, both producing a 256-dimensional embedding that encodes characteristics like hair color, face shape, and facial structure. This embedding is the bridge to Phase 2 pet generation.
+2. **Geometric pipeline** — MediaPipe Face Mesh (478 landmarks) plus DeepFace, extracting interpretable traits (face shape, eyes, skin tone, expression, age) and translating them into Stable Diffusion prompt tokens for pet generation.
+
+### Models
+
+| | ResNet-18 | ViT Multi-Head |
+|---|---|---|
+| Backbone | ResNet-18 (ImageNet-1k) | ViT-B/16 (ImageNet-21k) |
+| Output | 15 binary attributes (sigmoid) | 17 multi-class categories (softmax) |
+| Params | 11.3M | 86.0M |
+| Checkpoint | 136 MB | 344 MB |
+| Inference (batch 1) | 3.5 ms | 14.5 ms |
+| Embedding | 256-dim | 256-dim |
+| Best epoch | 19 | 9 |
+| Validation metric | mAP 0.7530 | mean acc 0.883 |
+
+The two models use different label schemas (CelebA binary attributes vs `flags.txt` categories), so their metrics are not directly comparable. The ViT is ~4x slower but starts from a richer pretraining and reaches higher mean accuracy; ResNet stays the lightweight option when speed matters.
 
 ## Project Structure
 
@@ -32,7 +50,13 @@ unique-pet-generation/
 │       ├── losses.py             # BCEWithLogitsLoss with class imbalance weighting
 │       └── metrics.py            # Per-attribute accuracy, F1, and mAP
 ├── notebooks/
-│   └── 01_explore_celeba.ipynb   # Data exploration and attribute distribution analysis
+│   ├── 00_s3_setup.ipynb                # Upload dataset to S3 for SageMaker training
+│   ├── 01_explore_celeba.ipynb          # Data exploration and attribute distribution analysis
+│   ├── 02_celeba_to_flags_mapping.ipynb # Map CelebA attributes to flags.txt categories
+│   ├── 03_sagemaker_vit_training.ipynb  # ViT-B/16 multi-head training on SageMaker (annotated)
+│   ├── 04_comparison_resnet_vit.ipynb   # ResNet vs ViT: params, speed, metrics, embeddings (annotated)
+│   ├── 05_normalizacion_de_outputs.ipynb # Normalize model outputs to a common schema
+│   └── 06_facemesh.ipynb                # MediaPipe + DeepFace feature extraction pipeline (annotated)
 ├── tests/
 │   ├── test_dataset.py           # Dataset loading, splits, and transform tests
 │   └── test_model.py             # Model forward pass, gradient flow, freeze/unfreeze tests
@@ -102,12 +126,29 @@ python scripts/inference.py path/to/photo.jpg
 pytest tests/ -v
 ```
 
+## Notebooks Pipeline
+
+The `notebooks/` directory documents the full Phase 1 workflow end to end. Notebooks 03, 04, and 06 carry cell-by-cell annotations (theory and result interpretation) in first person:
+
+- **03 — ViT training (SageMaker)**: ViT-B/16 multi-head with 17 softmax heads sharing a 256-dim embedding. Backbone frozen 5 epochs, then full fine-tune with discriminative learning rates and mixed precision. Early stopped at epoch 12, best at epoch 9, ~84 min on an A10G.
+- **04 — ResNet vs ViT**: side-by-side comparison of architecture, inference speed, saved metrics, embedding spaces (PCA / cosine), and agreement on overlapping concepts like hair color.
+- **06 — Face Mesh pipeline**: webcam or image → MediaPipe Face Mesh (478 landmarks) → geometric traits (face shape, eyes, skin tone, symmetry, eyebrows via landmark ratios) + DeepFace (emotion, age) → Stable Diffusion prompt tokens → `rasgos_checklist.json` for the generation step.
+
 ## Results
+
+### ResNet-18 baseline
 
 - **Best epoch**: 19 (early stopped at 24)
 - **Validation mAP**: 0.7530
 - **Validation accuracy**: 83.22%
 - **Embedding dimension**: 256
+
+### ViT multi-head
+
+- **Best epoch**: 9 (early stopped at 12)
+- **Validation mean accuracy**: 0.883
+- **Strong traits**: chin, freckles, glasses, skin tone, face shape (>0.95)
+- **Weak traits**: nose size/shape, eye shape (~0.68–0.79) — subtle, angle- and lighting-dependent, noisier labels
 
 See `doc/index.html` for the full project report.
 
