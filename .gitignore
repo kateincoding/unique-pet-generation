@@ -220,9 +220,9 @@ __marimo__/
 # Datasets (demasiado grandes para git)
 data/*
 !data/.gitkeep
-face_extractor/agus/data/
-face_extractor/kat/data/*
-!face_extractor/kat/data/.gitkeep
+face_extractor/cnn_from_scratch/data/
+face_extractor/transfer_learning/data/*
+!face_extractor/transfer_learning/data/.gitkeep
 
 # Checkpoints y outputs
 checkpoints/
