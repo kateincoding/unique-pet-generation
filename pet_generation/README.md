@@ -1,9 +1,8 @@
 # Generación de mascotas
 
-Notebooks de generación de mascotas (parte 6 de la memoria):
+Notebook de generación de mascotas (parte 6 de la memoria):
 
-- `mascota_generativa_v8.ipynb`
-- `mascota_generativa_v14.ipynb`
+- `pet_generation.ipynb`
 
 ## Archivos externos necesarios
 
@@ -32,8 +31,7 @@ Los modelos preentrenados y las imágenes de prueba no están en el repo porque 
 
 ```
 pet_generation/
-├── mascota_generativa_v8.ipynb
-├── mascota_generativa_v14.ipynb
+├── pet_generation.ipynb
 ├── final_model-agus.pt
 ├── resnet-18-kat.pt
 ├── vit_multihead_best-kat.pt
