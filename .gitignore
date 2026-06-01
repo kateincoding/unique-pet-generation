@@ -217,11 +217,19 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Project-specific
+# Datasets (demasiado grandes para git)
 data/*
 !data/.gitkeep
+face_extractor/agus/data/
+face_extractor/kat/data/*
+!face_extractor/kat/data/.gitkeep
+
+# Checkpoints y outputs
 checkpoints/
 outputs/
 wandb/
 *.pt
 *.pth
+
+# Claude Code
+.claude/
