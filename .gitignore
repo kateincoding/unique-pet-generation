@@ -233,3 +233,8 @@ wandb/
 
 # Claude Code
 .claude/
+
+# Archivos auxiliares de la memoria (locales, no para git)
+memoria_secciones.*
+md_to_docx.py
+~$*.docx
