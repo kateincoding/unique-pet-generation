@@ -221,8 +221,8 @@ __marimo__/
 data/*
 !data/.gitkeep
 face_extractor/cnn_from_scratch/data/
-face_extractor/transfer_learning/data/*
-!face_extractor/transfer_learning/data/.gitkeep
+face_extractor/resnet/data/*
+!face_extractor/resnet/data/.gitkeep
 
 # Checkpoints y outputs
 checkpoints/
