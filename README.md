@@ -1,4 +1,4 @@
-# Unique Pet Generation
+# Petly - Unique Pet Generation 🐾
 
 Genera mascotas virtuales que se parecen a sus dueños humanos, extrayendo rasgos faciales y mapeándolos a características de mascota mediante un modelo generativo.
 
