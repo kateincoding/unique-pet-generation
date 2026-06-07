@@ -170,6 +170,32 @@ Cada subcarpeta de `face_extractor/` y la de `pet_generation/` es autocontenida 
 - Para los pipelines basados en CelebA: [credenciales de la API de Kaggle](https://www.kaggle.com/docs/api) configuradas en `~/.kaggle/kaggle.json`.
 - Para el ViT: cuenta de AWS con permisos para SageMaker y S3.
 
+### Modelos preentrenados (entrega aparte)
+
+Los checkpoints `.pt` no están en el repositorio porque cada uno supera el límite de GitHub. Se distribuyen en un zip aparte que contiene una carpeta `models/` con tres archivos:
+
+```
+models/
+├── cnn_scratch.pt              (~6 MB)   — CNN multi-cabeza desde cero
+├── resnet-18.pt                (~136 MB) — ResNet-18 transfer learning
+└── vit_multihead_best.pt       (~344 MB) — ViT-B/16 multi-head
+```
+
+Cada subproyecto del repo espera los `.pt` en una carpeta y con un nombre concretos. La tabla siguiente indica dónde copiar cada archivo según qué se quiera ejecutar:
+
+| Si quieres ejecutar... | Copia desde `models/` | a esta ruta del repo |
+|---|---|---|
+| **Demo principal de generación de mascotas** (`pet_generation/pet_generation.ipynb`) | `cnn_scratch.pt` | `pet_generation/final_model-agus.pt` |
+| ↑ | `resnet-18.pt` | `pet_generation/resnet-18-kat.pt` |
+| ↑ | `vit_multihead_best.pt` | `pet_generation/vit_multihead_best-kat.pt` |
+| **Análisis CNN from scratch** (`face_extractor/cnn_from_scratch/facial_attributes_extractor.ipynb`) | `cnn_scratch.pt` | `face_extractor/cnn_from_scratch/checkpoints/final_model.pt` |
+| **Comparativa ResNet vs ViT** (`face_extractor/resnet/notebooks/04_comparison_resnet_vit.ipynb`) | `resnet-18.pt` | `face_extractor/resnet/checkpoints/resnet-18.pt` |
+| ↑ | `vit_multihead_best.pt` | `face_extractor/resnet/checkpoints/vit_multihead_best.pt` |
+
+> **Para el caso más común (sólo el demo principal)**: basta con copiar los tres archivos a `pet_generation/` renombrándolos como indica la tabla. Los notebooks de análisis individuales sólo son necesarios si se quieren reproducir los experimentos por separado.
+
+Adicionalmente, el demo necesita dos imágenes de prueba (`rostro_agus.jpeg` y `rostro_prueba.jpg`) que también se distribuyen en el zip. Se colocan al lado del notebook, en `pet_generation/`.
+
 ### CNN from scratch
 
 ```bash
