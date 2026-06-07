@@ -1,5 +1,7 @@
-# Petly - Unique Pet Generation 🐾
-<img width="70" height="70" alt="image" src="https://github.com/user-attachments/assets/ada07bce-4ea6-4926-a5e2-43dee01829f1" />
+<div style="display: flex; align-items: center; gap: 12px;">
+  <img width="70" height="70" src="https://github.com/user-attachments/assets/ada07bce-4ea6-4926-a5e2-43dee01829f1" />
+  <h1>Petly - Unique Pet Generation 🐾</h1>
+</div>
 
 Genera mascotas virtuales que se parecen a sus dueños humanos, extrayendo rasgos faciales y mapeándolos a características de mascota mediante un modelo generativo.
 
