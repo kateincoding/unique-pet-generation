@@ -96,8 +96,6 @@ Los detalles de arranque (`uvicorn`, `npm run dev`), variables de entorno (`PETL
 unique-pet-generation/
 ├── README.md                               # este archivo
 ├── LICENSE
-├── docs/
-│   └── index.html                          # reporte del proyecto para GitHub Pages
 ├── face_extractor/
 │   ├── README.md                           # índice de las 4 aproximaciones
 │   ├── cnn_from_scratch/                   # 5.1 CNN multi-cabeza desde cero
@@ -236,9 +234,7 @@ pytest tests/ -v
 
 Cubren la carga del dataset, los splits y transforms, los forwards de los backbones y el flujo de gradientes con freeze/unfreeze.
 
-## Reporte y notebooks documentados
-
-El reporte web completo del proyecto está en [`docs/index.html`](docs/index.html) (GitHub Pages).
+## Notebooks documentados
 
 Los siguientes notebooks llevan anotaciones celda por celda con teoría e interpretación de resultados:
 
