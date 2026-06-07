@@ -1,0 +1,17 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+pydantic>=2.6
+numpy
+pillow
+opencv-python
+mediapipe
+torch
+torchvision
+timm
+transformers
+# --- generacion de la imagen real (SD 1.5 + IP-Adapter + LCM-LoRA, como v14) ---
+diffusers>=0.27
+accelerate>=0.30
+peft>=0.11
+safetensors

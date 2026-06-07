@@ -6,7 +6,7 @@ Genera mascotas virtuales que se parecen a sus dueños humanos, extrayendo rasgo
 
 Cuatro aproximaciones complementarias extraen atributos faciales a partir de fotos de personas:
 
-1. **CNN entrenada desde cero** ([`face_extractor/cnn_from_scratch/`](face_extractor/cnn_from_scratch/README.md)) — backbone convolucional propio con 17 cabezas, entrenado sobre CelebA y fine-tuneado con FairFace, más dos cabezas extra de visión clásica para color de ojos y tono de piel. Sirve como baseline ligero (~6.5M parámetros) frente a los enfoques preentrenados.
+1. **CNN entrenada desde cero** ([`face_extractor/cnn_from_scratch/`](face_extractor/cnn_from_scratch/README.md)) — backbone convolucional propio con 17 cabezas, entrenado sobre CelebA y fine-tuneado con FairFace, más dos cabezas extra de visión clásica para color de ojos y tono de piel. Sirve como baseline ligero (~1.6M parámetros) frente a los enfoques preentrenados.
 2. **Transfer learning con ResNet-18** ([`face_extractor/resnet/`](face_extractor/resnet/README.md)) — produce un embedding de 256 dimensiones y predice 15 atributos binarios.
 3. **Vision Transformer multi-head** ([`face_extractor/vit/`](face_extractor/vit/README.md)) — ViT-B/16 con 17 cabezas softmax, entrenado en SageMaker.
 4. **Pipeline geométrico con MediaPipe Face Mesh** ([`face_extractor/clip_facemesh/`](face_extractor/clip_facemesh/README.md)) — MediaPipe (478 landmarks) + DeepFace, extrae rasgos interpretables y los traduce a prompt tokens para Stable Diffusion.
@@ -19,7 +19,7 @@ Cuatro aproximaciones complementarias extraen atributos faciales a partir de fot
 | Tipo de entrenamiento | Desde cero | Transfer learning | Transfer learning |
 | Datasets | CelebA + FairFace + pseudo-labels | CelebA | CelebA |
 | Salida | 19 atributos multi-clase | 15 atributos binarios (sigmoide) | 17 categorías multi-clase (softmax) |
-| Parámetros | 6.5M | 11.3M | 86.0M |
+| Parámetros | 1.6M | 11.3M | 86.0M |
 | Embedding / descriptor | 512-dim | 256-dim | 256-dim |
 | Mejor epoch | 8 | 19 | 9 |
 | Métrica de validación | acc media 0.872 | mAP 0.7530 | acc media 0.883 |
@@ -72,9 +72,23 @@ Estos modelos ya vienen entrenados por terceros. No se entrenan: solo se les pas
 
 ## Fase 2: Generación de la mascota
 
-La fase de generación reside en [`pet_generation/pet_generation.ipynb`](pet_generation/README.md). Toma los rasgos y embeddings extraídos en la Fase 1 y genera una mascota virtual condicionada por ellos. El notebook se apoya en un modelo de difusión (CuteFurry sobre Stable Diffusion) alimentado mediante prompt engineering: los rasgos faciales se traducen a tokens descriptivos en inglés (por ejemplo "round face", "small dark eyes", "olive skin", "neutral expression") que el encoder CLIP de Stable Diffusion convierte en vectores de condición. El resultado es una mascota cuya morfología, paleta de colores y expresión reflejan los rasgos del dueño.
+La fase de generación reside en [`pet_generation/pet_generation.ipynb`](pet_generation/README.md). Toma los rasgos extraídos en la Fase 1 y genera un *familiar mágico* — un animalito real y tierno (zorrito, búho, gatito, panda rojo, cervatillo...) — condicionado por la cara del usuario. El notebook articula el pipeline en tres bloques:
+
+1. **Ensemble de cinco fuentes**. Los tres modelos entrenados (`final_model-agus.pt`, `resnet-18-kat.pt`, `vit_multihead_best-kat.pt`) predicen probabilidades sobre 19 rasgos. A esas tres distribuciones se suman dos votantes adicionales: una extracción geométrica con MediaPipe Face Mesh (478 landmarks, 11 rasgos derivados de ratios) y un verificador zero-shot con CLIP (`openai/clip-vit-base-patch32`). Las cinco se combinan por voto suave ponderado por rasgo, con una capa final de corrección manual (`ipywidgets`) que permite ajustar cualquier predicción antes de pasar a generación.
+2. **Selección determinista de la criatura**. Un mapper convierte los rasgos consolidados en una especie, una paleta de colores y un conjunto de *traits* concretos. La función es determinista, así que la misma combinación de rasgos siempre desemboca en la misma especie.
+3. **Generación con difusión**. Stable Diffusion 1.5 (`Yntec/CuteFurry`) genera la imagen final, condicionada por (a) un prompt enfático construido a partir de los rasgos y la especie elegida con `compel` para ponderar tokens, (b) IP-Adapter *plus-face* (`h94/IP-Adapter`) que recibe la cara recortada del usuario para inyectar coloración y expresión, y (c) LCM-LoRA (`latent-consistency/lcm-lora-sdv1-5`) que reduce la inferencia a ~8 pasos en lugar de los 25-30 habituales.
 
 Los checkpoints de los modelos de la Fase 1 que el notebook consume (`final_model-agus.pt`, `resnet-18-kat.pt`, `vit_multihead_best-kat.pt`) y las imágenes de prueba (`rostro_agus.jpeg`, `rostro_prueba.jpg`) no están en el repositorio porque superan el límite de tamaño de GitHub. Se distribuyen aparte y deben colocarse al mismo nivel que el `.ipynb`. Ver [`pet_generation/README.md`](pet_generation/README.md) para la lista completa de archivos externos.
+
+## Aplicación web: Petly
+
+[`petly/`](petly/README.md) es la aplicación web que envuelve todo el pipeline anterior en un producto utilizable: el usuario sube una foto desde el navegador y recibe una mascota generada. Internamente reutiliza la misma lógica que el notebook de la Fase 2 (Stable Diffusion 1.5 + IP-Adapter *plus-face* + LCM-LoRA para acelerar la inferencia) más una capa determinista que traduce los 18 rasgos extraídos a una especie, una paleta de colores y un conjunto de *traits* concretos.
+
+- **Backend** (FastAPI, [`petly/backend/`](petly/backend/)): expone dos endpoints, `POST /api/analyze` (recibe la foto y devuelve la mascota propuesta con la PNG generada) y `GET /api/pets` (lista la colección). El pipeline de análisis facial es el mismo que el del notebook, portado a módulos Python (`pipeline/core.py`, `mapper.py`).
+- **Frontend** (Vite + React, [`petly/frontend/`](petly/frontend/)): port hifi del prototipo Petly con una *state machine* de cinco pantallas (intro → captura → análisis → reveal → galería). Si la generación con Stable Diffusion está apagada o falla, cae a un SVG vectorial procedural construido a partir de los mismos *traits*.
+- **Requisitos**: Python 3.11 con los checkpoints `.pt` del notebook, Node 18+, y opcionalmente GPU para que la generación con SD vaya en segundos en vez de minutos.
+
+Los detalles de arranque (`uvicorn`, `npm run dev`), variables de entorno (`PETLY_MODELS_DIR`, `PETLY_GEN`, `PETLY_GEN_STEPS`...) y el contrato de la API están en el [README de petly](petly/README.md).
 
 ## Estructura del Proyecto
 
@@ -125,9 +139,27 @@ unique-pet-generation/
 │       ├── notebooks/
 │       │   └── 06_facemesh.ipynb
 │       └── agus.jpg                        # imagen de ejemplo
-└── pet_generation/                         # Fase 2: generación con Stable Diffusion
+├── pet_generation/                         # Fase 2: generación con Stable Diffusion
+│   ├── README.md
+│   └── pet_generation.ipynb
+└── petly/                                  # Aplicación web (FastAPI + React)
     ├── README.md
-    └── pet_generation.ipynb
+    ├── backend/                            # FastAPI + pipeline portado del notebook
+    │   ├── app/
+    │   │   ├── main.py                     # app FastAPI, CORS, routers
+    │   │   ├── api/                        # /api/analyze, /api/pets
+    │   │   ├── pipeline/core.py            # lógica de análisis facial
+    │   │   ├── mapper.py                   # 18 rasgos → Pet (especie, color, traits)
+    │   │   ├── db.py                       # colección en SQLite
+    │   │   └── schemas.py                  # contrato Pet / Trait / AnalyzeResponse
+    │   └── requirements.txt
+    └── frontend/                           # Vite + React
+        ├── src/
+        │   ├── App.jsx                     # state machine + cliente
+        │   ├── api.js                      # llamadas al backend
+        │   ├── screens.jsx                 # intro / capture / analyze / reveal / gallery
+        │   └── pets.jsx                    # 6 mascotas SVG + registro
+        └── package.json
 ```
 
 ## Instalación y uso
@@ -219,8 +251,8 @@ Los siguientes notebooks llevan anotaciones celda por celda con teoría e interp
 
 ### CNN from scratch
 
-- **Parámetros**: 6.5M.
-- **Mejor epoch**: 8 (de 20).
+- **Parámetros**: 1.6M (1.57M backbone + 37K cabezas).
+- **Mejor epoch**: 8.
 - **Accuracy media de validación**: 0.872 sobre 15 cabezas activas de CelebA.
 - **Cabezas finales**: 19 (17 entrenadas por el CNN + 2 entrenadas sobre pseudo-etiquetas de visión clásica).
 - **Comportamiento observado**: predictor centrado en la moda del dataset en imágenes ambiguas; la cabeza CNN de tono de piel queda por debajo de la versión LAB, por lo que el sistema final se apoya en la versión clásica para esa decisión.

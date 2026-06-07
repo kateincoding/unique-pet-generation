@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Backend
+backend/petly.db
+backend/.env
+
+# Node / Vite
+node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Modelos pesados (no versionar los .pt)
+*.pt
+*.pth
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
