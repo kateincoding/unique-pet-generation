@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
   <img width="100" height="100" src="https://github.com/user-attachments/assets/ada07bce-4ea6-4926-a5e2-43dee01829f1" />
 
 # Petly - Unique Pet Generation 🐾
